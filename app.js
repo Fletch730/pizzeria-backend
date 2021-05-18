@@ -1,8 +1,18 @@
 const express=require('express');
 const app=express();
 const port=3000;
+const morgan = require("morgan");
+const cors = require("cors");
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use(cors()); // configure cors
+//configure body parser
+//configure body-parser ends here
+app.use(morgan("dev"));
+
+require("./config/db")(app);
 const routes=require('./routes/index')
 
 app.use(function (req, res, next) {
