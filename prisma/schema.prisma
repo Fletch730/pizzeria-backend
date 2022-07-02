@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String    @db.VarChar(255)
+  email         String    @db.VarChar(255)
+  password      String    @db.VarChar(255)
+  emailVerified Boolean   @default(false)
+  lastLogin     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  userRole      userRoles
+  userType      userTypes
+  contact       Contact[]
+  address       Address[]
+  payment       Payment[]
+  order         Order[]
+  cart          Cart[]
+
+}
+
+model Contact {
+  id             String @id @default(cuid())
+  fullName       String @db.VarChar(255)
+  primaryPhone   String @db.VarChar(255)
+  secondaryPhone String @db.VarChar(255)
+  primaryEmail   String @db.VarChar(255)
+  secondaryEmail String @db.VarChar(255)
+  firstName      String @db.VarChar(255)
+  lastName       String @db.VarChar(255)
+  userId         String @db.VarChar(255)
+  user           User   @relation(fields: [userId], references: [id])
+
+
+}
+
+model Address {
+  id       String @id @default(cuid())
+  address1 String @db.VarChar(255)
+  address2 String @db.VarChar(255)
+  address3 String @db.VarChar(255)
+  state    String @db.VarChar(255)
+  city     String @db.VarChar(255)
+  zip      String @db.VarChar(255)
+  country  String @db.VarChar(255)
+  userId   String @db.VarChar(255)
+  user     User   @relation(fields: [userId], references: [id])
+
+}
+
+model OrderDetails {
+  id          String @id @default(cuid())
+  description String @db.VarChar(255)
+  quantity    String @db.VarChar(255)
+  price       String @db.VarChar(255)
+  orderId     String @db.VarChar(255)
+  order       Order  @relation(fields: [orderId], references: [id])
+
+}
+
+model Cart {
+  id          String @id @default(cuid())
+  description String @db.VarChar(255)
+  quantity    String @db.VarChar(255)
+  price       String @db.VarChar(255)
+  userId      String @db.VarChar(255)
+  user        User   @relation(fields: [userId], references: [id])
+
+}
+
+model Order {
+  id           String         @id @default(cuid())
+  userId       String         @db.VarChar(255)
+  total        String         @db.VarChar(255)
+  paid         Boolean        @default(false)
+  user         User           @relation(fields: [userId], references: [id])
+  orderDetails OrderDetails[]
+
+}
+
+model Payment {
+  id           String @id @default(cuid())
+  creditNumber String @db.VarChar(255)
+  expiry       String @db.VarChar(255)
+  userId       String @db.VarChar(255)
+  user         User   @relation(fields: [userId], references: [id])
+
+}
+
+model Menu {
+  id          String       @id @default(cuid())
+  name        String       @db.VarChar(255)
+  calories    String       @db.VarChar(255)
+  description String       @db.VarChar(255)
+  price       Float
+  category    String       @db.VarChar(255)
+  imageUrl    String       @db.VarChar(255)
+  ingredient  Ingredient[]
+
+}
+
+model Ingredient {
+  id          String @id @default(cuid())
+  ingredient1 String @db.VarChar(255)
+  ingredient2 String @db.VarChar(255)
+  ingredient3 String @db.VarChar(255)
+  ingredient4 String @db.VarChar(255)
+  ingredient5 String @db.VarChar(255)
+  menuId      String @db.VarChar(255)
+  menu        Menu   @relation(fields: [menuId], references: [id])
+}
+
+model Feedback {
+  id            String @id @default(cuid())
+  comment       String @db.VarChar(255)
+  ratingService Int
+
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @db.VarChar(255)
+
+}
+
+enum userTypes {
+  customer
+  admin
+}
+
+enum userRoles {
+  owner
+  user
+}
