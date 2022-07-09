@@ -1,22 +1,24 @@
 import express from 'express'
 import "dotenv"
-import { PrismaClient, userRoles, userTypes } from '@prisma/client';
+import { schema } from './schema';
+import { ApolloServer } from 'apollo-server-express';
+import cors from 'cors';
 
-const app = express();
-const prisma = new PrismaClient()
 
-app.listen(process.env.PORT, async() => { 
-    await prisma.$connect()
-    const allUsers = await prisma.user.findMany()
-  console.log(allUsers)
-    await prisma.user.create({
-        data:{
-            name:"fletch",
-            email:"fletche@mail.com",
-            password:"1234",
-            userRole:userRoles.user,
-            userType:userTypes.customer
-        }
-    })
-    await prisma.$disconnect()
-    console.log("server listenikng on port 4000") })
+const startServer=async()=>{
+
+    const server = new ApolloServer({ schema });
+    await server.start()
+    const app = express();
+    app.use(cors())
+    server.applyMiddleware({ app });
+    
+    app.listen({ port: process.env.PORT }, () =>
+      console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+    );
+}
+startServer()
+
+
+
+
